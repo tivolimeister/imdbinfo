@@ -67,7 +67,11 @@ def get_movie(imdb_id: str, locale: Optional[str] = None) -> Optional[MovieDetai
     imdb_id, lang = normalize_imdb_id(imdb_id, locale)
     url = f"https://www.imdb.com/{lang}/title/tt{imdb_id}/reference"
     logger.info("Fetching movie %s", imdb_id)
-    resp = niquests.get(url, headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"})
+    if locale is None or locale.lower() == "en":
+        cookies = {'lc-main':'en_US'}
+    else:
+        cookies = {}
+    resp = niquests.get(url, headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"}, cookies=cookies)
     if resp.status_code != 200:
         logger.error("Error fetching %s: %s", url, resp.status_code)
         raise Exception(f"Error fetching {url}")
@@ -89,7 +93,11 @@ def search_title(title: str, locale: Optional[str] = None) -> Optional[SearchRes
     lang = _retrieve_url_lang(locale)
     url = f"https://www.imdb.com/{lang}/find?q={title}&ref_=nv_sr_sm"
     logger.info("Searching for title '%s'", title)
-    resp = niquests.get(url, headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"})
+    if locale is None or locale.lower() == "en":
+        cookies = {'lc-main':'en_US'}
+    else:
+        cookies = {}
+    resp = niquests.get(url, headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"}, cookies=cookies)
     if resp.status_code != 200:
         logger.warning("Search request failed: %s", resp.status_code)
         return None
